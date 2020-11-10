@@ -19,7 +19,7 @@ def simulate(year, trials=10):
                                                     4: 'Super Bowl Loser',
                                                     5: 'Super Bowl Winner'})
     print("Random coin tiebreaker activated in {} out of {} trials".format(bad_ties.sum(), trials))
-    probabilities = (playoff_outcomes.apply(pd.value_counts) / trials)
+    probabilities = (playoff_outcomes.apply(pd.value_counts) / trials).T
     get_div_winners = season_outcomes.reset_index()
     division_winners = get_div_winners[get_div_winners['Seed'] <= 4].set_index(['Conference', 'Seed'])
     probabilities['Division Winner'] = (division_winners.T.apply(pd.value_counts).sum(axis=1) / trials)
