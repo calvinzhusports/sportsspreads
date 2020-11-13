@@ -5,8 +5,13 @@ import numpy as np
 import pandas as pd
 
 
-def simulate(year, trials=10):
+def simulate(year, trials=10, override_schedule=False):
     schedule = get_schedule(year)
+    if override_schedule:
+        print("Make sure 'Played' column is overridden to True for desired games")
+        schedule = pd.read_csv('schedule_output.csv')
+    else:
+        schedule.to_csv('schedule_output.csv')
     remaining_games = schedule[-schedule['Played']]
     simulated_games = _simulate_regular_season(remaining_games, trials)
     season_outcomes, bad_ties = _determine_playoffs(schedule, simulated_games, year)
@@ -23,7 +28,10 @@ def simulate(year, trials=10):
     get_div_winners = season_outcomes.reset_index()
     division_winners = get_div_winners[get_div_winners['Seed'] <= 4].set_index(['Conference', 'Seed'])
     probabilities['Division Winner'] = (division_winners.T.apply(pd.value_counts).sum(axis=1) / trials)
-    return probabilities.fillna(0.0)
+    probabilities = probabilities.fillna(0.0)
+    probabilities.to_csv('probabilities_output.csv')
+    season_outcomes.T.to_csv('seedings_output.csv')
+    return probabilities
 
 
 def _simulate_regular_season(games, trials):
